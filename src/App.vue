@@ -9,10 +9,10 @@
     :key="timer.id" 
     :name="timer.name" 
     :time="timer.currentTimerValue"
-    @remove-timer="removeTimer(index)"
-    @start-timer="startTimer(index)"    
-    @pause-timer="stopTimer(timer.timerId)"
-    @reset-timer="stopTimer(timer.timerId); timer.currentTimerValue=timer.time; startTimer(index)"
+    @remove-timer="removeTimer(timer, index)"
+    @start-timer="startTimer(timer)"    
+    @pause-timer="stopTimer(timer)"
+    @reset-timer="stopTimer(timer); timer.currentTimerValue=timer.time; startTimer(timer)"
     />
 
 </template>
@@ -32,7 +32,6 @@ export default {
       addingNewTimer: false,
       idTracking: 1,
       timers:[],
-      timeUp: false
     }
   },
   methods:{
@@ -40,31 +39,33 @@ export default {
       this.addingNewTimer = true
     },
     addNewTimer(values){
-      this.timers.push({name: values.nameTimer, time: values.time, id: values.id, currentTimerValue: values.time})
+      this.timers.push({name: values.nameTimer, time: values.time, id: values.id, currentTimerValue: values.time, timerId: null})
       this.addingNewTimer = false
       this.idTracking++
     },
-
-    removeTimer(index){
-      if(this.timers[index].timerId){
-        this.stopTimer(this.timers[index].timerId)
+    removeTimer(whichtimer, index){
+      if(whichtimer.timerId){
+        this.stopTimer(whichtimer)
       }
       this.timers.splice(index, 1)
     },
 
-    startTimer(index){
-      this.timers[index].timerId = setInterval(() => {
-        if (this.timers[index].currentTimerValue === 0){
+    startTimer(whichtimer){
+      whichtimer.timerId = setInterval(() => {
+        if (whichtimer.currentTimerValue === 0){
+          this.stopTimer(whichtimer)
           var msg = new SpeechSynthesisUtterance();
-          msg.text = this.timers[index].name+" is done";
+          msg.text = whichtimer.name+" is done";
           window.speechSynthesis.speak(msg);
         }
-        this.timers[index].currentTimerValue--
+        else{
+        whichtimer.currentTimerValue--
+        }
       }, 1000);
     },
 
-    stopTimer(timerId){
-      clearInterval(timerId)
+    stopTimer(whichtimer){
+      clearInterval(whichtimer.timerId)
     }
   },
 }
