@@ -34,6 +34,7 @@ export default {
             if(!this.nameTimer){this.nameTimer='Timer '+this.id}
             var time = this.seconds+this.minutes*60
             if(time<1){
+              alert("please set a time")
                 return
             }
             this.$emit('set-timer', {nameTimer: this.nameTimer, time: time, id: this.id})
